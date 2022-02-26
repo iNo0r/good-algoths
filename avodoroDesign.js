@@ -1,12 +1,13 @@
 class Session {
-    constructor(parentName, type = "", durationByMinutes = 20, timePassed = 0) {
-        this.type = type; // work || break || avodoroWork
+    constructor(parentName, type = "", durationByMinutes = 20) {
+        this.parentName = parentName
+        this.type = type; // work || break 
+        this.durationByMinutes = durationByMinutes
         this.durationBySeconds = durationByMinutes * 60;
         // time passed will be levarged when duration changes, so 
-        this.timePassed = timePassed;
+        this.timePassed = 0;
         this.timeLeft = this.duration - this.timePassed;
         // 
-        this.parentName = parentName
     }
     sessionProduct() {
         return {
@@ -14,10 +15,11 @@ class Session {
             duration: this.durationBySeconds
         }
     }
+    // i sat it private because why not 
     #countDownInterval = undefined;
 
-    //  i used currying here, because passing an argumnet 
-    startTimer(session) {
+    //  i used currying here, because when i called in event handler, it auto invoke it self if i passed it with an argument 
+    startTimer(session, callback) {
         return function () {
             console.log(session)
             // let durationBymillis = this.durationBySeconds * 1000
@@ -31,11 +33,12 @@ class Session {
                 if (session.durationBySeconds < 1) {
                     clearInterval(myInterval);
                     // session.pushSession(DayReport)
-                    Bus.pushSession(session.sessionProduct(), session.parentName)
+                    // Bus.pushSession(session.sessionProduct(), session.parentName)
+
+                    // this callback going to be recived from Bus object 
+                    callback()
 
                 }
-
-
 
             }, 1000)
         }
@@ -59,27 +62,62 @@ class Session {
 
 class DayReport {
 
-    // name = 'someone'
-    constructor(sessions = []) {
+    constructor(parentName) {
 
-        this.sessions = sessions
+        this.parentName = parentName
+        this.sessions = []
         this.date = (new Date()).getTime()
     }
 
-    set session(value) {
+    addSession(value) {
         this.sessions.push(value)
+        Bus.updateReport(dayReport)
     }
 }
 
 
+class Reports {
+    constructor() {
+        this.list = [];
+        this.inceptionDate = (new Date()).getTime()
+    }
+    get totalMonths() {
+        // calculate months from inception till todays date
+    }
+    get totalWeeks() {
+        // calculate weeks from inception till todays date
+    }
+    get totalDays() {
+        // calculate days from inception till todays date
+    }
+    updateReport(report) {
 
+        let lastItemIndex = this.list.length - 1
+        let lastItem = this.list[lastItemIndex]
 
+        // to check if same day report or new day 
+        if (lastItem.date === report.date) {
+            this.list[lastItemIndex] = report
+            return
+        }
+        this.list.push(report)
+    }
+}
 
-let globalObject = this
+// globalObject 
 class Bus {
 
-    static pushSession(session, dayReportName /* Report */) {
-        globalObject[dayReportName].list.push(session)
+    constructor(session, dayReport, reports) {
+        this.session = session;
+        this.dayReport = dayReport;
+        this.reports = reports;
+    }
+    // when duration of session is done, dayReport and reports have to be updated 
+    pushSession() {
+        this.dayReport.addSession(this.session)
+        this.reports.updateReport(this.dayReport)
+
+        // perhabe update the use with the new reports 
     }
 
 }
