@@ -3,7 +3,9 @@ class Session {
         this.parentName = parentName
         this.type = type; // work || break 
         this.durationByMinutes = durationByMinutes
-        this.durationBySeconds = durationByMinutes * 60;
+        //rechange
+        // this.durationBySeconds = durationByMinutes * 60;
+        this.durationBySeconds = 1;
         // time passed will be levarged when duration changes, so 
         this.timePassed = 0;
         this.timeLeft = this.duration - this.timePassed;
@@ -19,21 +21,22 @@ class Session {
     #countDownInterval = undefined;
 
     //  i used currying here, because when i called in event handler, it auto invoke it self if i passed it with an argument 
-    startTimer(session, callback) {
-        return function () {
-            console.log(session)
-            // let durationBymillis = this.durationBySeconds * 1000
-            console.log(`this timer will run for ${session.durationBySeconds / 60} minutes`)
+    startTimer(callback) {
 
-            session.#countDownInterval = setInterval(function () {
-                console.log(session.durationBySeconds)
-                session.durationBySeconds--
-                session.timePassed++
-                console.log(session.durationBySeconds)
-                if (session.durationBySeconds < 1) {
-                    clearInterval(myInterval);
-                    // session.pushSession(DayReport)
-                    // Bus.pushSession(session.sessionProduct(), session.parentName)
+        return () => {
+            console.log(this)
+            // let durationBymillis = this.durationBySeconds * 1000
+            console.log(`this timer will run for ${this.durationBySeconds / 60} minutes`)
+
+            this.#countDownInterval = setInterval(() => {
+                console.log(this.durationBySeconds)
+                this.durationBySeconds--
+                this.timePassed++
+                console.log(this.durationBySeconds)
+                if (this.durationBySeconds < 1) {
+                    clearInterval(this.#countDownInterval);
+                    // this.pushSession(DayReport)
+                    // Bus.pushSession(this.sessionProduct(), this.parentName)
 
                     // this callback going to be recived from Bus object 
                     callback()
@@ -44,10 +47,10 @@ class Session {
         }
         // }))
     }
-    pauseTimer(session) {
+    pauseTimer() {
         return function () {
 
-            clearInterval(session.#countDownInterval)
+            clearInterval(this.#countDownInterval)
         }
     }
     stopTimer(session) {
@@ -62,16 +65,14 @@ class Session {
 
 class DayReport {
 
-    constructor(parentName) {
-
-        this.parentName = parentName
+    constructor() {
         this.sessions = []
         this.date = (new Date()).getTime()
     }
 
     addSession(value) {
         this.sessions.push(value)
-        Bus.updateReport(dayReport)
+        // Bus.updateReport(dayReport)
     }
 }
 
@@ -92,9 +93,14 @@ class Reports {
     }
     updateReport(report) {
 
+        if (this.list.length < 1) {
+            return this.list.push(report)
+        }
         let lastItemIndex = this.list.length - 1
         let lastItem = this.list[lastItemIndex]
 
+        console.log(lastItem)
+        // console.log(report.date)
         // to check if same day report or new day 
         if (lastItem.date === report.date) {
             this.list[lastItemIndex] = report
@@ -106,30 +112,36 @@ class Reports {
 
 // globalObject 
 class Bus {
-
     constructor(session, dayReport, reports) {
         this.session = session;
         this.dayReport = dayReport;
         this.reports = reports;
     }
     // when duration of session is done, dayReport and reports have to be updated 
-    pushSession() {
+    pushSession = () => {
+        // console.log("hell")
+        console.log(this)
         this.dayReport.addSession(this.session)
         this.reports.updateReport(this.dayReport)
-
+        console.log(this.dayReport, this.reports)
         // perhabe update the use with the new reports 
     }
 
 }
 
 
-var dayReport1 = new DayReport()
 var session1 = new Session('dayReport1', 'work', 1)
+var dayReport1 = new DayReport()
+var reports1 = new Reports()
+// var myBus = new Bus(session1, dayReport1, reports1)
+var myBus = new Bus(session1, dayReport1, reports1)
+
 
 function myFunction() {
     console.log('test !!')
 }
 
+// myBus.pushSession()
 
 
 // html elements 
@@ -143,8 +155,8 @@ timerEl.innerText = `${session1.durationBySeconds} s`
 
 
 let myString = "hello"
-startBtn.addEventListener("click", session1.startTimer(session1))
-pauseBtn.addEventListener("click", session1.pauseTimer(session1))
+startBtn.addEventListener("click", session1.startTimer(myBus.pushSession))
+pauseBtn.addEventListener("click", session1.pauseTimer())
 
 testEl.innerHTML = myString;
 
