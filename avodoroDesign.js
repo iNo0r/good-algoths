@@ -5,7 +5,7 @@ class Session {
         this.durationByMinutes = durationByMinutes
         //rechange
         // this.durationBySeconds = durationByMinutes * 60;
-        this.durationBySeconds = 1;
+        this.durationBySeconds = 7;
         // time passed will be levarged when duration changes, so 
         this.timePassed = 0;
         this.timeLeft = this.duration - this.timePassed;
@@ -48,16 +48,16 @@ class Session {
         // }))
     }
     pauseTimer() {
-        return function () {
+        return () => {
 
             clearInterval(this.#countDownInterval)
         }
     }
-    stopTimer(session) {
-        return function () {
-
-            clearInterval(session.#countDownInterval)
-            session.durationBySeconds = session.durationByMinutes * 60;
+    stopTimer() {
+        return () => {
+            console.log(this)
+            clearInterval(this.#countDownInterval)
+            this.durationBySeconds = this.durationByMinutes * 60;
         }
     }
 }
@@ -123,7 +123,7 @@ class Bus {
         console.log(this)
         this.dayReport.addSession(this.session)
         this.reports.updateReport(this.dayReport)
-        console.log(this.dayReport, this.reports)
+
         // perhabe update the use with the new reports 
     }
 
