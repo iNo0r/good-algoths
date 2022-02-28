@@ -1,6 +1,5 @@
 class Session {
-    constructor(parentName, type = "", durationByMinutes = 20) {
-        this.parentName = parentName
+    constructor(type = "", durationByMinutes = 20) {
         this.type = type; // work || break 
         this.durationByMinutes = durationByMinutes
         //rechange
@@ -35,8 +34,6 @@ class Session {
                 console.log(this.durationBySeconds)
                 if (this.durationBySeconds < 1) {
                     clearInterval(this.#countDownInterval);
-                    // this.pushSession(DayReport)
-                    // Bus.pushSession(this.sessionProduct(), this.parentName)
 
                     // this callback going to be recived from Bus object 
                     callback()
@@ -72,7 +69,6 @@ class DayReport {
 
     addSession(value) {
         this.sessions.push(value)
-        // Bus.updateReport(dayReport)
     }
 }
 
@@ -130,7 +126,7 @@ class Bus {
 }
 
 
-var session1 = new Session('dayReport1', 'work', 1)
+var session1 = new Session('work', 1)
 var dayReport1 = new DayReport()
 var reports1 = new Reports()
 // var myBus = new Bus(session1, dayReport1, reports1)
